@@ -23,7 +23,11 @@
 * 브라우저 dom 레디 `dom-ready`, 컨텐츠 로드가 다 끝났을 때  `did-finish-load`, 새 윈도우 `new-window`, 리다이렉트 `will-redirect`   
 
 
+19 11 30  
+3. 세션
 
+4. 쿠키
 
+....
 
-
+5. 다운로드아이템
