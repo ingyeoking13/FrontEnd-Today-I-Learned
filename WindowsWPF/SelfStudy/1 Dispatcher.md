@@ -218,6 +218,18 @@ private void MainWindow_Dispatcher_Button_Dispatcher_same_btn_Click(object sende
 
 ```
 
+
+
+# 참고 UWP에서는 Button 상속은 다음과 같습니다.  
+
+`WPF`  
+>  `Button`<-`ButtonBase`<-`ContentControl`<-`Control`<-`FrameworkElement`<-`UIElement`<-`Visual`<-`DependencyObject`<-`DispatcherObject` 
+
+`UWP`   
+>  `Button`<-`ButtonBase`<-`ContentControl`<-`Control`<-`FrameworkElement`<-`UIElement`<-`DependencyObject` 
+
+그렇다면 `Dispatcher`개념이 없을까요? 실제론 그렇지 않습니다. `UWP`에선 `DependencyObject`가 `Dispatcher`역할을 하는 `CoreDispatcher`를 멤버 변수로 가지고 있습니다. `CoreDispatcher`에 대해선 추후에 정리해보겠습니다.  
+
 다음은 `DependencyObject`에 대해서 살펴보겠습니다.
 
 EOF
