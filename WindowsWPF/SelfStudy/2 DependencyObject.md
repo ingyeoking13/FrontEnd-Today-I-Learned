@@ -42,19 +42,57 @@ namespace System.Windows
       
         public void SetValue(DependencyProperty dp, object value);
         public void SetValue(DependencyPropertyKey key, object value);
-        // 요약:
-        //     이 System.Windows.DependencyObject에서 종속성 속성의 유효 값이 업데이트될 때마다 호출됩니다. 변경된 특정 종속성
-        //     속성이 이벤트 데이터에서 보고됩니다.
-        // 매개 변수:
-        //   e:
-        //     관심 있는 종속성 속성 식별자, 형식에 대한 속성 메타데이터, 기존 값 및 새 값을 포함하는 이벤트 데이터입니다.
+
         protected virtual void OnPropertyChanged(DependencyPropertyChangedEventArgs e);
         protected internal virtual bool ShouldSerializeProperty(DependencyProperty dp);
     }
 }
-
-`
 ```
+
+`dependencyObject` 이하 줄여서 `DO`의 상속받는 클래스는 `WPF`에서 종속성 시스템 서비스를 이용 할 수 있습니다. 종속성 시스템의 주 목적은 프로퍼티의 값을 연산하는 것과 값의 변화를 알리는 것입니다. 그리고 종속성 시스템과 연관되어있는 주요 클래스는 `DependnecyProperty`(`DP`)입니다. `DP`는 종속성 시스템에서 종속성 프로퍼티들(`dependency properties`)를 등록하고, 각 종속성 프로퍼티들에 대한 정보와 식별화를 제공해줍니다. 반면에 `DO`는 베이스 클래스로서 종속성 프로퍼티들을 사용합니다.   
+
+그렇다면 종속성 프로퍼티는 무엇일까요?  
+종속성 프로퍼티란 속성의 한 종류입니다. 윈도우즈 런타임의 일부로서 동작하는 어느 한 프로퍼티 시스템을 추적하고 영향을 받는 값을 가지고 있습니다. 앱이 런타임에 있을 때, 기존의 윈도우즈 런타임 프로퍼티 기능에서 글로벌, 인터널 프로퍼티 저장소를 제공해서 모든 종속성 프로퍼티를 저장하는 기능을 가집니다. 이 설계 패턴을 이용하면, 각 속성들이 그 속성을 정의하는 클래스 내부에 그 값을 가지고 있지 않아도 됩니다.   
+인터널 프로퍼티 저장소가 특정 객체(`DO`를 상속하는)를 위해 존재하는 프로퍼티의 식별자와 값을 가지고 있다고 봐도 무방합니다. 윈도우즈 속성 시스템의 디테일한 구현 로직은 숨겨져 있지만 `xaml`의 속성 또는 코드로 작성한 프로퍼티 이름을 이용하여 종속성 프로퍼티에 한에서는 쉽게 접근 가능합니다.   
+
+실질적으로 이 프로퍼티 시스템은 윈도우즈 에서 돌아가는 앱, `XAML` UI와 C#, VB, C++/CX 를 이용한 개발에서 이용되고 다음을 지원합니다.  
+
+* 데이터바인딩  
+* 스타일링  
+* 스토리보드 애니메이션  
+* PropertyChanged 동작
+* Property metadata의 default value 사용  
+
+`DO`는 다음과 같은 주요 기능을 하는데요. 크게 다섯가지로 나눌 수 있습니다. 
+
+1. 종속성 프로퍼티(`Dependency Property`) 호스팅 지원. 내부적으로 `DependencyProperty.Register` 메서드를 호출하여 종속성 프로퍼티를 등록하고, 클래스 내부에 public static field를 두어 메서드의 리턴 값을 저장해둡니다.  
+2. 연결된 프로퍼티(`Attached Property`) 호스팅 지원. 내부적으로 `DependencyProperty.RegisterAttached` 메서드를 호출하여 연결된 프로퍼티를 등록하고, 클래스 내부에 public static field를 두어 메서드의 리턴 값을 저장해둡니다.  
+3. Get, Set, Clear 메서드를 두어서 `DO`에 존재하는 종속성 프로퍼티의 값을 조종합니다.  
+4. 종속성 프로퍼티나 연결된 프로퍼티에 대해, Metadata, coerce value support, **Property Changed notification**, override callbacks 를 지원합니다. 
+5. 여러 클래스 `Visual`, 
+
+이 모든걸 정리하자면 다음과 같습니다.  
+1. `DP`와 종속성 프로퍼티와 차이는 `DP`는 종속성 시스템에서 종속성 프로퍼티를 식별하는데 이용되는 클래스이고, 종속성 프로퍼티는 MS가 설계한 프로퍼티 시스템에 존재하는 속성의 한 종류이다.    
+2. 종속성 프로퍼티를 생성하는데 사용되어야할 클래스는 반드시 `DO`여야 한다.  
+3. `DO`는 여러개의 `DP`를 가질수 있다.  
+
+아래 소스는 `DO` 하위 클래스에서 `DP`를 생성하는 방식입니다.  
+
+```cs
+// IsSpinningProperty is the dependency property identifier
+// no need for info in the last PropertyMetadata parameter, so we pass null
+public static readonly DependencyProperty IsSpinningProperty =
+    DependencyProperty.Register(
+        "IsSpinning", typeof(Boolean),
+        typeof(ExampleClass), null
+    );
+// The property wrapper, so that callers can use this property through a simple ExampleClassInstance.IsSpinning usage rather than requiring property system APIs
+public bool IsSpinning
+{
+    get { return (bool)GetValue(IsSpinningProperty); }
+    set { SetValue(IsSpinningProperty, value); }
+}
+
 
 ```cs
 #region 어셈블리 Windows.Foundation.UniversalApiContract, Version=8.0.0.0, Culture=neutral, PublicKeyToken=null, ContentType=WindowsRuntime
@@ -79,61 +117,22 @@ namespace Windows.UI.Xaml
         public void SetValue(DependencyProperty dp, object value);
        
         public void ClearValue(DependencyProperty dp);
-        //
         // 요약:
         //     로컬 값이 설정된 경우, 종속성 속성의 로컬 값을 반환합니다.
-        //
-        // 매개 변수:
-        //   dp:
-        //     로컬 값을 검색할 속성의 DependencyProperty 식별자입니다.
-        //
-        // 반환 값:
-        //     로컬 값을 반환하거나, 로컬 값이 설정되어 있지 않은 경우 센티널 값인 UnsetValue를 반환합니다.
         public object ReadLocalValue(DependencyProperty dp);
-        //
         // 요약:
         //     종속성 속성에 대해 설정되어 있고 애니메이션이 활성 상태가 아닐 때 적용되는 기준 값을 반환합니다.
-        //
-        // 매개 변수:
-        //   dp:
-        //     원하는 종속성 속성의 식별자입니다.
-        //
-        // 반환 값:
-        //     반환된 기준 값입니다.
         public object GetAnimationBaseValue(DependencyProperty dp);
-        //
         // 요약:
         //     이 DependencyObject 인스턴스에 대한 특정 DependencyProperty의 변경 내용을 수신하도록 알림 기능을 등록합니다.
-        //
         // 매개 변수:
-        //   dp:
-        //     속성 변경 알림에 등록할 속성의 종속성 속성 식별자입니다.
-        //
-        //   callback:
-        //     DependencyPropertyChangedCallback 대리자 기반 호출로, 지정된 속성의 값이 변경될 때 시스템에서 호출됩니다.
-        //
-        // 반환 값:
-        //     호출을 나타내는 토큰으로, UnregisterPropertyChangedCallback 호출 시 호출을 식별하는 데 사용됩니다.
         public long RegisterPropertyChangedCallback(DependencyProperty dp, DependencyPropertyChangedCallback callback);
-        //
         // 요약:
         //     이전에 RegisterPropertyChangedCallback을 호출하여 등록된 변경 알림을 취소합니다.
-        //
-        // 매개 변수:
-        //   dp:
-        //     속성 변경 알림에서 등록 취소할 속성의 종속성 속성 식별자입니다.
-        //
-        //   token:
-        //     호출(RegisterPropertyChangedCallback에 의해 반환됨)을 나타내는 토큰입니다.
         public void UnregisterPropertyChangedCallback(DependencyProperty dp, long token);
-
-        //
         // 요약:
         //     이 개체와 연결된 CoreDispatcher를 가져옵니다. CoreDispatcher는 코드가 UI가 아닌 스레드에 의해 시작되었더라도 UI
-        //     스레드에서 DependencyObject에 액세스할 수 있는 기능을 나타냅니다.
-        //
-        // 반환 값:
-        //     DependencyObject 개체가 연결되어 있는 CoreDispatcher로, UI 스레드를 나타냅니다.
+        //     스레드에서 DependencyObject에 액세스할 수 있는 .
         public CoreDispatcher Dispatcher { get; }
     }
 }
