@@ -69,7 +69,7 @@ namespace System.Windows
 2. 연결된 프로퍼티(`Attached Property`) 호스팅 지원. 내부적으로 `DependencyProperty.RegisterAttached` 메서드를 호출하여 연결된 프로퍼티를 등록하고, 클래스 내부에 public static field를 두어 메서드의 리턴 값을 저장해둡니다.  
 3. Get, Set, Clear 메서드를 두어서 `DO`에 존재하는 종속성 프로퍼티의 값을 조종합니다.  
 4. 종속성 프로퍼티나 연결된 프로퍼티에 대해, Metadata, coerce value support, **Property Changed notification**, override callbacks 를 지원합니다. 
-5. 여러 클래스 `Visual`, 
+5. 여러 클래스 `Visual`(`UIElement`) 
 
 이 모든걸 정리하자면 다음과 같습니다.  
 1. `DP`와 종속성 프로퍼티와 차이는 `DP`는 종속성 시스템에서 종속성 프로퍼티를 식별하는데 이용되는 클래스이고, 종속성 프로퍼티는 MS가 설계한 프로퍼티 시스템에 존재하는 속성의 한 종류이다.    
@@ -92,7 +92,9 @@ public bool IsSpinning
     get { return (bool)GetValue(IsSpinningProperty); }
     set { SetValue(IsSpinningProperty, value); }
 }
+```
 
+아래는 UWP에서의 `DO`입니다. `Dispatcher`를 제외하고는 크게 다른 특징은 없습니다.
 
 ```cs
 #region 어셈블리 Windows.Foundation.UniversalApiContract, Version=8.0.0.0, Culture=neutral, PublicKeyToken=null, ContentType=WindowsRuntime
@@ -117,22 +119,10 @@ namespace Windows.UI.Xaml
         public void SetValue(DependencyProperty dp, object value);
        
         public void ClearValue(DependencyProperty dp);
-        // 요약:
-        //     로컬 값이 설정된 경우, 종속성 속성의 로컬 값을 반환합니다.
         public object ReadLocalValue(DependencyProperty dp);
-        // 요약:
-        //     종속성 속성에 대해 설정되어 있고 애니메이션이 활성 상태가 아닐 때 적용되는 기준 값을 반환합니다.
         public object GetAnimationBaseValue(DependencyProperty dp);
-        // 요약:
-        //     이 DependencyObject 인스턴스에 대한 특정 DependencyProperty의 변경 내용을 수신하도록 알림 기능을 등록합니다.
-        // 매개 변수:
         public long RegisterPropertyChangedCallback(DependencyProperty dp, DependencyPropertyChangedCallback callback);
-        // 요약:
-        //     이전에 RegisterPropertyChangedCallback을 호출하여 등록된 변경 알림을 취소합니다.
         public void UnregisterPropertyChangedCallback(DependencyProperty dp, long token);
-        // 요약:
-        //     이 개체와 연결된 CoreDispatcher를 가져옵니다. CoreDispatcher는 코드가 UI가 아닌 스레드에 의해 시작되었더라도 UI
-        //     스레드에서 DependencyObject에 액세스할 수 있는 .
         public CoreDispatcher Dispatcher { get; }
     }
 }
