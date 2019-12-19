@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<meta charset="UTF-8">
+
+<head>
+  <script src="indexedDbMainControl-0.1.js"></script>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>Document</title>
+</head>
+
+
+<body>
+  <iframe src="./1.html" id="mainIframe">
+  </iframe>
+  <input type="button" value="go back" onclick="navi_back()">
+  <input type="button" value="go next" onclick="navi_front()">
+</body>
+
+<script>
+  function navi_front() {
+    var elem = document.getElementById("mainIframe");
+    elem.src = "2.html";
+  }
+
+  function navi_back() {
+    var elem = document.getElementById("mainIframe");
+    elem.src = "1.html";
+  }
+</script>
+
+
+</html>
