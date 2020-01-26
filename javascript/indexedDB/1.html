@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <script src="indexedDbMainControl-0.1.js"></script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>Document</title>
+</head>
+
+<body style="background-color: #AAFF22;">
+  <p>hi</p>
+  <input type="button" value="create variable 1" onclick="myFunc()">
+
+  <form>
+    <input id="variable-from-2.html" type="input" onchange="inputFuncOnChange()">
+  </form>
+</body>
+<script>
+  // createDB().then((r) => {
+  //   getVariableFromIndexedDB("variable-from-2.html").then((r) => {
+  //     document.getElementById("variable-from-2.html").value = r.Property;
+  //     getVariableFromIndexedDB("variable-from-2.html").onchange = inputFuncOnChange();
+  //   });
+  // });
+
+  function myFunc() {
+    var new_object = {
+      VariableName: "variable-from-1.html",
+      DefaultValue: "Ellipse",
+      Property: "Property",
+      IsMaintained: true
+    };
+
+    addVariableToIndexedDB(new_object);
+  }
+
+
+  function inputFuncOnChange() {
+    var val = document.getElementById("variable-from-2.html").value;
+    getVariableFromIndexedDB("variable-from-2.html").then((r) => {
+      r.Property = val;
+      updateVariableToIndexedDB(r);
+    });
+  }
+</script>
+
+
+
+</html>

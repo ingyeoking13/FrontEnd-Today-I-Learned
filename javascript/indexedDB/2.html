@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <script src="indexedDbMainControl-0.1.js"></script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>Document</title>
+</head>
+
+<body style="background-color: blue;">
+  <p>bye</p>
+  <input type="button" value="create variable 2" onclick="myFunc()">
+</body>
+
+<script>
+  function myFunc() {
+
+    var var_object = {
+      VariableName: "variable-from-2.html",
+      DefaultValue: "Rectangle",
+      Property: "Property2",
+      IsMaintained: false
+    }
+    addVariableToIndexedDB(var_object);
+  }
+</script>
+
+</html>
